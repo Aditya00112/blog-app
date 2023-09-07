@@ -1,0 +1,75 @@
+package: blog
+policies:
+- id: allow-blog-post-view
+  description: Allow all users to view blog posts
+  resources:
+  - kind: BlogPost
+    instances:
+    - '*'
+  subjects:
+  - kind: User
+  actions:
+  - view
+  effect: allow
+- id: allow-blog-post-create
+  description: Allow authors to create new blog posts
+  resources:
+  - kind: BlogPost
+    instances:
+    - '*'
+  subjects:
+  - kind: User
+    conditions:
+    - key: role
+      operator: eq
+      value: author
+  actions:
+  - create
+  effect: allow
+- id: allow-blog-post-edit
+  description: Allow authors to edit their own blog posts
+  resources:
+  - kind: BlogPost
+    instances:
+    - '*'
+  subjects:
+  - kind: User
+    conditions:
+    - key: role
+      operator: eq
+      value: author
+  actions:
+  - edit
+  effect: allow
+- id: allow-blog-post-delete
+  description: Allow authors and moderators to delete blog posts
+  resources:
+  - kind: BlogPost
+    instances:
+    - '*'
+  subjects:
+  - kind: User
+    conditions:
+    - key: role
+      operator: in
+      values:
+      - author
+      - moderator
+  actions:
+  - delete
+  effect: allow
+- id: deny-blog-post-delete-other
+  description: Deny users from deleting others' blog posts
+  resources:
+  - kind: BlogPost
+    instances:
+    - '*'
+  subjects:
+  - kind: User
+  actions:
+  - delete
+  effect: deny
+  conditions:
+  - key: role
+    operator: neq
+    value: moderator
